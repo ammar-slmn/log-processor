@@ -1,6 +1,7 @@
 package com.example.logprocessor.api;
 
 import com.example.logprocessor.core.LogEvent;
+import com.example.logprocessor.kafka.KafkaLogProducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,12 +15,18 @@ import javax.ws.rs.core.Response;
 @Consumes(MediaType.APPLICATION_JSON)
 public class LogResource {
     private static final Logger log = LoggerFactory.getLogger(LogResource.class);
+    private final KafkaLogProducer logProducer;
+
+    public LogResource(KafkaLogProducer logProducer) {
+        this.logProducer = logProducer;
+    }
 
     @POST
     public Response ingestLog(@Valid LogEvent event) {
-        // For Phase 1 merely acknowledge we received it;
-        // Phase 2 will push to Kafka.
         log.info("Received log: {}", event);
-        return Response.accepted().entity("{\"status\":\"queued\"}").build();
+        logProducer.send(event);
+        return Response.accepted()
+                .entity("{\"status\":\"queued\"}")
+                .build();
     }
 }

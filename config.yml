@@ -6,4 +6,9 @@ server:
     - type: http
       port: 8081
 
-kafkaBootstrapServers: "localhost:9092"
+kafka:
+  bootstrapServers: "localhost:9092"
+  topic: "logs"
+  acks: "all"
+  lingerMs: 5
+  retries: 3
